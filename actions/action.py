@@ -1,3 +1,4 @@
+import os
 import threading
 
 # Import gtk modules - used for the config rows
@@ -10,8 +11,7 @@ from loguru import logger as log
 from plugins.com_linkybook_FFXIVDeck.actions import FFXIVDeckBase
 
 
-categories = Gtk.StringList()
-# "MainCommand", "Emote")
+categories = Gtk.StringList.new(["MainCommand", "Emote"])
 
 
 class DoAction(FFXIVDeckBase):
@@ -50,7 +50,7 @@ class DoAction(FFXIVDeckBase):
 
         return [self.category, self.name]
 
-    def on_job_changed(self, entry, *args):
+    def on_action_changed(self, entry, *args):
         action_name = entry.get_text()
 
         settings = self.get_settings()
@@ -61,8 +61,8 @@ class DoAction(FFXIVDeckBase):
 
     def load_config_defaults(self):
         settings = self.get_settings()
-        self.category.set_text(settings.get("name", "")) # Does not accept None
-        self.name.set_text(settings.get("name", "")) # Does not accept None
+        self.category.set_selected(settings.get("category", 0))
+        self.name.set_text(settings.get("name", ""))
 
     def on_key_down(self):
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
