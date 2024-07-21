@@ -1,13 +1,17 @@
 import os
 import threading
 
-from gi.repository import Adw
+# Import gtk modules - used for the config rows
+import gi
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+from gi.repository import Gtk, Adw
 from loguru import logger as log
 
-from plugins.com_linkybook_ffxivdeck.actions import FFXIVDeckBase
+from plugins.com_linkybook_FFXIVDeck.actions import FFXIVDeckBase
 
 
-class ChangeJob(FFXIVDeckBase):
+class ChangeClass(FFXIVDeckBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -15,11 +19,11 @@ class ChangeJob(FFXIVDeckBase):
         self.cache_dir /= "class"
 
     def on_ready(self):
-        self.set_media(media_path=os.path.join(self.plugin_base.PATH, "assets", "job.webp"), size=0.8)
+        icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+        self.set_media(media_path=icon_path)
 
     def get_config_rows(self) -> list:
         self.job_name = Adw.EntryRow(title="Job Name")
-
         self.load_config_defaults()
 
         # Connect signals

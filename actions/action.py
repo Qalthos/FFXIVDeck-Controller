@@ -1,12 +1,17 @@
 import threading
 
+# Import gtk modules - used for the config rows
+import gi
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw
 from loguru import logger as log
 
-from plugins.com_linkybook_ffxivdeck.actions import FFXIVDeckBase
+from plugins.com_linkybook_FFXIVDeck.actions import FFXIVDeckBase
 
 
-categories = Gtk.StringList("MainCommand", "Emote")
+categories = Gtk.StringList()
+# "MainCommand", "Emote")
 
 
 class DoAction(FFXIVDeckBase):
@@ -17,6 +22,8 @@ class DoAction(FFXIVDeckBase):
         self.cache_dir /= "action"
 
     def on_ready(self):
+        icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+        self.set_media(media_path=icon_path)
         self.update()
 
     def update(self):
