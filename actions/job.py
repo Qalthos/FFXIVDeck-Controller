@@ -1,14 +1,15 @@
 import os
 import threading
 
+from loguru import logger as log
+
+from plugins.com_linkybook_FFXIVDeck.actions import FFXIVDeckBase
+
 # Import gtk modules - used for the config rows
 import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw
-from loguru import logger as log
-
-from plugins.com_linkybook_FFXIVDeck.actions import FFXIVDeckBase
 
 
 class ChangeClass(FFXIVDeckBase):
@@ -18,11 +19,11 @@ class ChangeClass(FFXIVDeckBase):
         self.path = "/classes"
         self.cache_dir /= "class"
 
-    def on_ready(self):
+    def on_ready(self) -> None:
         icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
         self.set_media(media_path=icon_path)
 
-    def get_config_rows(self) -> list:
+    def get_config_rows(self) -> list[Adw.EntryRow]:
         self.job_name = Adw.EntryRow(title="Job Name")
         self.load_config_defaults()
 
@@ -31,7 +32,7 @@ class ChangeClass(FFXIVDeckBase):
 
         return [self.job_name]
 
-    def on_job_changed(self, entry, *args):
+    def on_job_changed(self, entry, *args) -> None:
         job_name = entry.get_text()
 
         settings = self.get_settings()
@@ -46,14 +47,14 @@ class ChangeClass(FFXIVDeckBase):
         else:
             log.debug(f"Cannot find {icon_path}")
 
-    def load_config_defaults(self):
+    def load_config_defaults(self) -> None:
         settings = self.get_settings()
         self.job_name.set_text(settings.get("name", "")) # Does not accept None
 
-    def on_key_down(self):
+    def on_key_down(self) -> None:
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
 
-    def _on_key_down(self):
+    def _on_key_down(self) -> None:
         settings = self.get_settings()
         job = settings.get("name")
 

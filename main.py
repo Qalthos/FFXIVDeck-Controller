@@ -1,7 +1,9 @@
-from src.backend.PluginManager.PluginBase import PluginBase
-from src.backend.PluginManager.ActionHolder import ActionHolder
+from loguru import log
 
-# Import actions
+from src.backend.DeckManagement.InputIdentifier import Input
+from src.backend.PluginManager.ActionHolder import ActionHolder
+from src.backend.PluginManager.ActionInputSupport import ActionInputSupport
+from src.backend.PluginManager.PluginBase import PluginBase
 from .actions.action import DoAction
 from .actions.job import ChangeClass
 
@@ -10,12 +12,19 @@ class FFXIVPlugin(PluginBase):
     def __init__(self):
         super().__init__()
 
+        log.debug("Launch backend")
+
         ## Register actions
         self.job_holder = ActionHolder(
             plugin_base=self,
             action_base=ChangeClass,
             action_id_suffix="ChangeClass",
             action_name="Change Class",
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.UNSUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
         )
         self.add_action_holder(self.job_holder)
 
@@ -24,6 +33,11 @@ class FFXIVPlugin(PluginBase):
             action_base=DoAction,
             action_id_suffix="DoAction",
             action_name="Do Action",
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.UNSUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
         )
         self.add_action_holder(self.action_holder)
 
