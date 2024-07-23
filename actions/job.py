@@ -12,15 +12,30 @@ class ChangeClass(ActionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.cache_dir = Path("~/.cache").expanduser() / "class"
+        self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "class"
+
+    @property
+    def name(self) -> str:
+        settings = self.get_settings()
+        return settings.get("name", "")
 
     def on_ready(self) -> None:
-        icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
-        self.set_media(media_path=icon_path)
+        self.update_appearance(self.name)
+
+    def update_appearance(self, job_name: str) -> None:
+        icon_path = self.cache_dir / f"{job_name.lower()}.png"
+        if icon_path.exists:
+            self.set_media(media_path=icon_path)
+        else:
+            log.debug(f"Cannot find {icon_path}")
+            icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+            self.set_media(media_path=icon_path)
+
+        self.set_label(text=job_name.title())
 
     def get_config_rows(self) -> list[Adw.EntryRow]:
         self.job_name = Adw.EntryRow(title="Job Name")
-        self.load_config_defaults()
+        self.job_name.set_text(self.name)
 
         # Connect signals
         self.job_name.connect("notify::text", self.on_job_changed)
@@ -34,17 +49,7 @@ class ChangeClass(ActionBase):
         settings["name"] = job_name
         self.set_settings(settings)
 
-        # Appearance
-        self.set_label(text=job_name.title())
-        icon_path = self.cache_dir / f"{job_name.lower()}.png"
-        if icon_path.exists():
-            self.set_media(media_path=icon_path)
-        else:
-            log.debug(f"Cannot find {icon_path}")
-
-    def load_config_defaults(self) -> None:
-        settings = self.get_settings()
-        self.job_name.set_text(settings.get("name", "")) # Does not accept None
+        self.update_appearance(job_name)
 
     def on_key_down(self) -> None:
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
