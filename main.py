@@ -1,3 +1,5 @@
+import os
+
 from loguru import log
 
 from src.backend.DeckManagement.InputIdentifier import Input
@@ -13,6 +15,8 @@ class FFXIVPlugin(PluginBase):
         super().__init__()
 
         log.debug("Launch backend")
+        backend = os.path.join(self.PATH,  "backend", "backend.py")
+        self.launch_backend(backend)
 
         ## Register actions
         self.job_holder = ActionHolder(
@@ -27,19 +31,6 @@ class FFXIVPlugin(PluginBase):
             },
         )
         self.add_action_holder(self.job_holder)
-
-        self.action_holder = ActionHolder(
-            plugin_base=self,
-            action_base=DoAction,
-            action_id_suffix="DoAction",
-            action_name="Do Action",
-            action_support={
-                Input.Key: ActionInputSupport.SUPPORTED,
-                Input.Dial: ActionInputSupport.UNSUPPORTED,
-                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
-            },
-        )
-        self.add_action_holder(self.action_holder)
 
         # Register plugin
         self.register(
