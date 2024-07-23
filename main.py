@@ -36,5 +36,5 @@ class FFXIVPlugin(PluginBase):
             plugin_name="FFXIVDeck-Controller",
             github_repo="https://github.com/qalthos/FFXIVDeck-Controller",
             plugin_version="0.0.1",
-            app_version="1.0.0-alpha"
+            app_version="1.1.1-alpha"
         )

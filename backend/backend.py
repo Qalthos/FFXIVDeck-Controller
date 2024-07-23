@@ -86,3 +86,5 @@ class FFXIVDeckProxy(BackendBase):
         except Exception as exc:
             log.error(exc)
             raise
+
+backend = FFXIVDeckProxy()
