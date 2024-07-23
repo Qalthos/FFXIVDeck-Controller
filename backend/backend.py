@@ -8,7 +8,7 @@ import websocket
 
 
 log = logging.getLogger(__name__)
-log.setLever(logging.DEBUG)
+log.setLevel(logging.DEBUG)
 
 INIT = {
     "Opcode": "init",
