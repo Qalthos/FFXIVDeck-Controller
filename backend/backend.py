@@ -62,6 +62,7 @@ class FFXIVDeckProxy(BackendBase):
 
     @ensure_connect
     def get_json(self, path: str):
+        log.debug(f"Requesting {self.base_url}{path}")
         try:
             resp = self.session.get(self.base_url + path, timeout=2)
             log.debug(resp.text)
@@ -76,6 +77,7 @@ class FFXIVDeckProxy(BackendBase):
 
     @ensure_connect
     def post(self, path: str, data: str = "") -> str:
+        log.debug(f"Sending {data} to {self.base_url}{path}")
         try:
             resp = self.session.post(self.base_url + path, data=data.encode("utf8"), timeout=2)
             log.debug(resp.text)
