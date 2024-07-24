@@ -24,10 +24,11 @@ class ChangeClass(ActionBase):
 
     def update_appearance(self, job_name: str) -> None:
         icon_path = self.cache_dir / f"{job_name.lower()}.png"
+        log.debug(f"Trying to set icon to {icon_path}")
         if icon_path.exists:
             self.set_media(media_path=icon_path)
         else:
-            log.debug(f"Cannot find {icon_path}")
+            log.warning(f"Cannot find {icon_path}")
             icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
             self.set_media(media_path=icon_path)
 
