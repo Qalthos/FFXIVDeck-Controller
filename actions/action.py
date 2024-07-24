@@ -94,4 +94,4 @@ class DoAction(ActionBase):
             self.show_error(duration=1)
             return
 
-        self.plugin_base.backend.post(f"action/{action_data['id']}/execute")
+        self.plugin_base.backend.post(f"action/{category}/{action_data['id']}/execute")
