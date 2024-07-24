@@ -39,15 +39,16 @@ class DoAction(ActionBase):
         self.set_label(text=name.title())
 
     def get_config_rows(self) -> list:
+        self._action = Adw.EntryRow(title="Action Name")
+        self._action.set_text(self.name)
         self._category = Adw.ComboRow(model=categories, title="Category")
         self._category.set_selected(self.category)
-        self.action_name = Adw.EntryRow(title="Action Name")
-        self.action_name.set_text(self.name)
 
         # Connect signals
-        self.action_name.connect("notify::text", self.on_action_changed)
+        self._action.connect("notify::text", self.on_action_changed)
+        self._category.connect("notify::selected", self.on_category_changed)
 
-        return [self._category, self.action_name]
+        return [self._category, self._action]
 
     # Callbacks
     def on_ready(self) -> None:
@@ -55,13 +56,20 @@ class DoAction(ActionBase):
         self.update_appearance(category, self.name)
 
     def on_action_changed(self, entry, *args):
-        action_name = entry.get_text()
+        name = entry.get_text()
 
         settings = self.get_settings()
-        settings["name"] = action_name
+        settings["name"] = name
         self.set_settings(settings)
 
         self.update_appearance()
+
+    def on_category_changed(self, entry, *args):
+        category = entry.get_text()
+
+        settings = self.get_settings()
+        settings["category"] = category
+        self.set_settings(settings)
 
     def on_key_down(self):
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
