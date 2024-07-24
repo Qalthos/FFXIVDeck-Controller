@@ -28,7 +28,7 @@ class DoAction(ActionBase):
         return settings.get("category", 0)
 
     def update_appearance(self, category: str, name: str) -> None:
-        icon_path = self.cache_dir / category / f"{name.lower()}.png"
+        icon_path = self.cache_dir / category / f"{name}.png"
         if icon_path.exists():
             self.set_media(media_path=icon_path)
         else:
@@ -84,7 +84,7 @@ class DoAction(ActionBase):
         action_data = None
         if actions is not None:
             for action_data in actions:
-                if action_data.get("name") == action.lower():
+                if action_data.get("name") == action:
                     break
             else:
                 action_data = None
