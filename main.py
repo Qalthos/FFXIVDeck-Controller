@@ -6,6 +6,8 @@ from src.backend.DeckManagement.InputIdentifier import Input
 from src.backend.PluginManager.ActionHolder import ActionHolder
 from src.backend.PluginManager.ActionInputSupport import ActionInputSupport
 from src.backend.PluginManager.PluginBase import PluginBase
+from .actions.action import DoAction
+from .actions.command import RunCommand
 from .actions.job import ChangeClass
 
 
@@ -18,6 +20,32 @@ class FFXIVPlugin(PluginBase):
         self.launch_backend(backend)
 
         ## Register actions
+        self.action_holder = ActionHolder(
+            plugin_base=self,
+            action_base=DoAction,
+            action_id_suffix="DoAction",
+            action_name="Do Action",
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.UNSUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
+        )
+        self.add_action_holder(self.action_holder)
+
+        self.command_holder = ActionHolder(
+            plugin_base=self,
+            action_base=RunCommand,
+            action_id_suffix="RunCommand",
+            action_name="Run Command",
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.UNSUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
+        )
+        self.add_action_holder(self.command_holder)
+
         self.job_holder = ActionHolder(
             plugin_base=self,
             action_base=ChangeClass,
