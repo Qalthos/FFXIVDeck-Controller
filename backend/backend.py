@@ -1,14 +1,11 @@
 from functools import wraps
-import logging
 import json
 
+from loguru import logger as log
 import requests
 from streamcontroller_plugin_tools import BackendBase
 import websocket
 
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 INIT = {
     "Opcode": "init",
@@ -32,7 +29,7 @@ class FFXIVDeckProxy(BackendBase):
         self.session = requests.Session()
 
     def connect(self) -> None:
-        url = f"ws://{self.host}:{self.port}"
+        url = f"ws://{self.host}:{self.port}/ws"
         log.debug(f"Connecting to {url}")
         self.ws.connect(url)
 
