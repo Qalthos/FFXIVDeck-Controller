@@ -12,7 +12,7 @@ class ChangeClass(ActionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "class"
+        self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "class"
 
     @property
     def name(self) -> str:
