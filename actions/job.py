@@ -19,9 +19,6 @@ class ChangeClass(ActionBase):
         settings = self.get_settings()
         return settings.get("name", "")
 
-    def on_ready(self) -> None:
-        self.update_appearance(self.name)
-
     def update_appearance(self, job_name: str) -> None:
         icon_path = self.cache_dir / f"{job_name.lower()}.png"
         log.debug(f"Trying to set icon to {icon_path}")
@@ -42,6 +39,10 @@ class ChangeClass(ActionBase):
         self.job_name.connect("notify::text", self.on_job_changed)
 
         return [self.job_name]
+
+    # Callbacks
+    def on_ready(self) -> None:
+        self.update_appearance(self.name)
 
     def on_job_changed(self, entry, *args) -> None:
         job_name = entry.get_text()

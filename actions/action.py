@@ -23,9 +23,9 @@ class DoAction(ActionBase):
         return settings.get("name", "")
 
     @property
-    def category(self) -> str:
+    def category(self) -> int:
         settings = self.get_settings()
-        return categories[settings.get("category", 0)]
+        return settings.get("category", 0)
 
     def update_appearance(self, category: str, name: str) -> None:
         icon_path = self.cache_dir / category / f"{name.lower()}.png"
@@ -39,19 +39,20 @@ class DoAction(ActionBase):
         self.set_label(text=name.title())
 
     def get_config_rows(self) -> list:
-        self.category_row = Adw.ComboRow(model=categories, title="Category")
-        self.name_row = Adw.EntryRow(title="Action Name")
-
-        self.load_config_defaults()
+        self._category = Adw.ComboRow(model=categories, title="Category")
+        self._category.set_selected(self.category)
+        self.action_name = Adw.EntryRow(title="Action Name")
+        self.action_name.set_text(self.name)
 
         # Connect signals
-        self.name_row.connect("notify::text", self.on_action_changed)
+        self.action_name.connect("notify::text", self.on_action_changed)
 
-        return [self.category_row, self.name_row]
+        return [self._category, self.action_name]
 
     # Callbacks
     def on_ready(self) -> None:
-        self.update_appearance(self.category, self.name)
+        category = categories.get_string(self.category)
+        self.update_appearance(category, self.name)
 
     def on_action_changed(self, entry, *args):
         action_name = entry.get_text()
@@ -67,9 +68,10 @@ class DoAction(ActionBase):
 
     def _on_key_down(self):
         action = self.action
+        category = categories.get_string(self.category)
 
         # Find available actions
-        actions = self.get_json(f"actions/{self.category}")
+        actions = self.get_json(f"actions/{category}")
         action_data = None
         if actions is not None:
             for action_data in actions:

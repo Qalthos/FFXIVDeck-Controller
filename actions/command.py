@@ -19,8 +19,7 @@ class RunCommand(ActionBase):
 
     def get_config_rows(self) -> list:
         self._command = Adw.EntryRow(title="Command to run")
-
-        self.load_config_defaults()
+        self._command.set_text(self.command)
 
         # Connect signals
         self._command.connect("notify::text", self.on_command_changed)
