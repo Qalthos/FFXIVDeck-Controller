@@ -62,7 +62,8 @@ class DoAction(ActionBase):
         settings["name"] = name
         self.set_settings(settings)
 
-        self.update_appearance()
+        category = categories.get_string(self.category)
+        self.update_appearance(category, name)
 
     def on_category_changed(self, entry, *args):
         category = entry.get_text()
@@ -75,7 +76,7 @@ class DoAction(ActionBase):
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
 
     def _on_key_down(self):
-        action = self.action
+        action = self.name
         category = categories.get_string(self.category)
 
         # Find available actions
