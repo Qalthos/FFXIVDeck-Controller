@@ -75,9 +75,9 @@ class FFXIVDeckProxy(BackendBase):
             raise
 
     @ensure_connect
-    def post(self, path: str) -> str:
+    def post(self, path: str, data: str = "") -> str:
         try:
-            resp = self.session.post(self.base_url + path, timeout=2)
+            resp = self.session.post(self.base_url + path, data=data.encode("utf8"), timeout=2)
             log.debug(resp.text)
             return resp.text
         except Exception as exc:

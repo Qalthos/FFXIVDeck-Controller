@@ -56,8 +56,7 @@ class ChangeClass(ActionBase):
         threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
 
     def _on_key_down(self) -> None:
-        settings = self.get_settings()
-        job = settings.get("name")
+        job = self.name
 
         # Find available classes
         try:
