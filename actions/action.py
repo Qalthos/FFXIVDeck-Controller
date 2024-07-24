@@ -71,7 +71,7 @@ class DoAction(ActionBase):
         category = categories.get_string(self.category)
 
         # Find available actions
-        actions = self.get_json(f"actions/{category}")
+        actions = self.plugin_base.backend.get_json(f"actions/{category}")
         action_data = None
         if actions is not None:
             for action_data in actions:
@@ -85,4 +85,4 @@ class DoAction(ActionBase):
             self.show_error(duration=1)
             return
 
-        self.post(f"actions/{action_data['id']}/execute")
+        self.plugin_base.backend.post(f"actions/{action_data['id']}/execute")

@@ -47,4 +47,4 @@ class RunCommand(ActionBase):
         }
         data = json.dumps(payload).encode("utf8")
 
-        self.post("/command", data=data)
+        self.plugin_base.backend.post("/command", data=data)
