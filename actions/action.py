@@ -66,7 +66,7 @@ class DoAction(ActionBase):
         self.update_appearance(category, name)
 
     def on_category_changed(self, entry, *args):
-        category = entry.get_text()
+        category = entry.get_selected()
 
         settings = self.get_settings()
         settings["category"] = category
