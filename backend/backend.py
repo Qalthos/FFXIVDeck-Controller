@@ -18,6 +18,7 @@ class FFXIVDeckProxy(BackendBase):
     host: str = "127.0.0.1"
     port: int = 37984
     api_key: str = ""
+    _connected: bool = False
 
     ws: websocket.WebSocket
     session: requests.Session
@@ -41,17 +42,22 @@ class FFXIVDeckProxy(BackendBase):
         reply = json.loads(resp)
         self.api_key = reply["apiKey"]
         self.session.headers["Authorization"] = f"Bearer {self.api_key}"
-
-    @property
-    def is_connected(self) -> bool:
-        return self.ws.connected
+        self._connected = True
 
     def ensure_connect(func):
         @wraps(func)
         def wrapped(self, *args, **kwargs):
-            if not self.is_connected:
+            if not self._connected:
                 self.connect()
-            return func(self, *args, **kwargs)
+            try:
+                return func(self, *args, **kwargs)
+            except requests.exceptions.HTTPError as exc:
+                self._connected = False
+                self.api_key = ""
+
+                # Try again
+                self.connect()
+                return func(self, *args, **kwargs)
 
         return wrapped
 
@@ -66,6 +72,8 @@ class FFXIVDeckProxy(BackendBase):
         try:
             resp = self.session.get(self.base_url + path, timeout=2)
             log.debug(resp.text)
+            log.debug(resp.status_code)
+            resp.raise_for_status()
             try:
                 return resp.json()
             except json.decoder.JSONDecodeError as exc:
@@ -81,6 +89,8 @@ class FFXIVDeckProxy(BackendBase):
         try:
             resp = self.session.post(self.base_url + path, data=data.encode("utf8"), timeout=2)
             log.debug(resp.text)
+            log.debug(resp.status_code)
+            resp.raise_for_status()
             return resp.text
         except Exception as exc:
             log.error(exc)
