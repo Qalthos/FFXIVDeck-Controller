@@ -15,7 +15,7 @@ INIT = {
 }
 
 
-class FFXIVDeckProxy(BackendBase):
+class XIVDeckProxy(BackendBase):
     host: str = "127.0.0.1"
     port: int = 37984
     api_key: str = ""
@@ -54,11 +54,12 @@ class FFXIVDeckProxy(BackendBase):
         self._connected = True
 
     def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
-        log.debug(msg)
+        log.debug(f"Recieved websocket message {msg}")
 
     def ws_close(self, ws: websocket.WebSocket) -> None:
         self.api_key = ""
         self._connected = False
+        log.debug("Websocket has closed")
 
     def ensure_connect(func):
         @wraps(func)
@@ -98,6 +99,7 @@ class FFXIVDeckProxy(BackendBase):
             raise
 
     def _request(self, path: str, data: str = "", method: str = "GET") -> str:
+        log.debug(self.session.headers)
         resp = self.session.request(
             method=method,
             url=self.base_url + path,
@@ -108,4 +110,4 @@ class FFXIVDeckProxy(BackendBase):
         resp.raise_for_status()
         return resp.text
 
-backend = FFXIVDeckProxy()
+backend = XIVDeckProxy()
