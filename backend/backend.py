@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+import threading
 
 from loguru import logger as log
 import requests
@@ -14,29 +15,37 @@ INIT = {
 }
 
 
-class FFXIVDeckProxy(BackendBase):
+class XIVDeckProxy(BackendBase):
     host: str = "127.0.0.1"
     port: int = 37984
     api_key: str = ""
     _connected: bool = False
 
-    ws: websocket.WebSocket
     session: requests.Session
 
     def __init__(self):
         super().__init__()
 
-        self.ws = websocket.WebSocket()
         self.session = requests.Session()
 
     def connect(self) -> None:
         url = f"ws://{self.host}:{self.port}/ws"
         log.debug(f"Connecting to {url}")
-        self.ws.connect(url)
+        ws = websocket.WebSocketApp(
+            url,
+            on_open=self.ws_open,
+            on_message=self.ws_msg,
+            on_close=self.ws_close,
+        )
+        ws_thread = threading.Thread(target=ws.run_forever)
+        ws_thread.daemon = True
+        ws_thread.start()
 
+    # websocket callbacks
+    def ws_open(self, ws: websocket.WebSocket) -> None:
         payload = json.dumps(INIT)
-        self.ws.send(payload)
-        resp = self.ws.recv()
+        ws.send(payload)
+        resp = ws.recv()
         log.debug(resp)
 
         reply = json.loads(resp)
@@ -44,20 +53,20 @@ class FFXIVDeckProxy(BackendBase):
         self.session.headers["Authorization"] = f"Bearer {self.api_key}"
         self._connected = True
 
+    def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
+        log.debug(f"Recieved websocket message {msg}")
+
+    def ws_close(self, ws: websocket.WebSocket) -> None:
+        self.api_key = ""
+        self._connected = False
+        log.debug("Websocket has closed")
+
     def ensure_connect(func):
         @wraps(func)
         def wrapped(self, *args, **kwargs):
             if not self._connected:
                 self.connect()
-            try:
-                return func(self, *args, **kwargs)
-            except requests.exceptions.HTTPError as exc:
-                self._connected = False
-                self.api_key = ""
-
-                # Try again
-                self.connect()
-                return func(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
 
         return wrapped
 
@@ -70,12 +79,9 @@ class FFXIVDeckProxy(BackendBase):
     def get_json(self, path: str):
         log.debug(f"Requesting {self.base_url}{path}")
         try:
-            resp = self.session.get(self.base_url + path, timeout=2)
-            log.debug(resp.text)
-            log.debug(resp.status_code)
-            resp.raise_for_status()
+            resp = self._request(path)
             try:
-                return resp.json()
+                return json.loads(resp)
             except json.decoder.JSONDecodeError as exc:
                 log.error(exc)
                 raise
@@ -87,13 +93,21 @@ class FFXIVDeckProxy(BackendBase):
     def post(self, path: str, data: str = "") -> str:
         log.debug(f"Sending {data} to {self.base_url}{path}")
         try:
-            resp = self.session.post(self.base_url + path, data=data.encode("utf8"), timeout=2)
-            log.debug(resp.text)
-            log.debug(resp.status_code)
-            resp.raise_for_status()
-            return resp.text
+            return self._request(path, data=data, method="POST")
         except Exception as exc:
             log.error(exc)
             raise
 
-backend = FFXIVDeckProxy()
+    def _request(self, path: str, data: str = "", method: str = "GET") -> str:
+        log.debug(self.session.headers)
+        resp = self.session.request(
+            method=method,
+            url=self.base_url + path,
+            data=data.encode("utf8"),
+            timeout=2
+        )
+        log.debug(f"Returned {resp.status_code}: {resp.text!r}")
+        resp.raise_for_status()
+        return resp.text
+
+backend = XIVDeckProxy()
