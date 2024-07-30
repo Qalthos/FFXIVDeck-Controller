@@ -45,16 +45,17 @@ class XIVDeckProxy(BackendBase):
     def ws_open(self, ws: websocket.WebSocket) -> None:
         payload = json.dumps(INIT)
         ws.send(payload)
-        resp = ws.recv()
-        log.debug(resp)
-
-        reply = json.loads(resp)
-        self.api_key = reply["apiKey"]
-        self.session.headers["Authorization"] = f"Bearer {self.api_key}"
-        self._connected = True
 
     def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
         log.debug(f"Recieved websocket message {msg}")
+        match json.loads(msg):
+            case {"messageType": "initReply", "apiKey": api_key, "version": version}:
+                log.debug("Setting API key to {api_key}")
+                self.api_key = api_key
+                self.session.headers["Authorization"] = f"Bearer {self.api_key}"
+                self._connected = True
+            case _:
+                log.debug(f"Unhandled message: {msg}")
 
     def ws_close(self, ws: websocket.WebSocket) -> None:
         self.api_key = ""
