@@ -99,6 +99,7 @@ class XIVDeckProxy(BackendBase):
             raise
 
     def _request(self, path: str, data: str = "", method: str = "GET") -> str:
+        log.debug(f"API key: {self.api_key}")
         log.debug(self.session.headers)
         resp = self.session.request(
             method=method,
