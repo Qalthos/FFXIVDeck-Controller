@@ -1,6 +1,7 @@
 from functools import wraps
 import json
 import threading
+import time
 
 from loguru import logger as log
 import requests
@@ -50,7 +51,7 @@ class XIVDeckProxy(BackendBase):
         log.debug(f"Recieved websocket message {msg}")
         match json.loads(msg):
             case {"messageType": "initReply", "apiKey": api_key, "version": version}:
-                log.debug("Setting API key to {api_key}")
+                log.debug(f"Setting API key to {api_key}")
                 self.api_key = api_key
                 self.session.headers["Authorization"] = f"Bearer {self.api_key}"
                 self._connected = True
@@ -67,6 +68,8 @@ class XIVDeckProxy(BackendBase):
         def wrapped(self, *args, **kwargs):
             if not self._connected:
                 self.connect()
+                while not self._connected:
+                    time.sleep(0.1)
             return func(self, *args, **kwargs)
 
         return wrapped
