@@ -42,6 +42,10 @@ class XIVDeckProxy(BackendBase):
         ws_thread.daemon = True
         ws_thread.start()
 
+    def disconnect(self) -> None:
+        self.api_key = ""
+        self._connected = False
+
     # websocket callbacks
     def ws_open(self, ws: websocket.WebSocket) -> None:
         payload = json.dumps(INIT)
@@ -59,8 +63,7 @@ class XIVDeckProxy(BackendBase):
                 log.debug(f"Unhandled message: {msg}")
 
     def ws_close(self, ws: websocket.WebSocket) -> None:
-        self.api_key = ""
-        self._connected = False
+        self.disconnect()
         log.debug("Websocket has closed")
 
     def ensure_connect(func):
@@ -112,7 +115,13 @@ class XIVDeckProxy(BackendBase):
             timeout=2
         )
         log.debug(f"Returned {resp.status_code}: {resp.text!r}")
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError:
+            self.disconnect()
+            raise
+
         return resp.text
+
 
 backend = XIVDeckProxy()
