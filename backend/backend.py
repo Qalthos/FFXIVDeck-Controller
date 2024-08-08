@@ -22,6 +22,7 @@ class XIVDeckProxy(BackendBase):
     api_key: str = ""
     _connected: bool = False
 
+    ws: websocket.WebSocket
     session: requests.Session
 
     def __init__(self):
@@ -43,6 +44,7 @@ class XIVDeckProxy(BackendBase):
         ws_thread.start()
 
     def disconnect(self) -> None:
+        self.ws = None
         self.api_key = ""
         self._connected = False
 
@@ -50,6 +52,7 @@ class XIVDeckProxy(BackendBase):
     def ws_open(self, ws: websocket.WebSocket) -> None:
         payload = json.dumps(INIT)
         ws.send(payload)
+        self.ws = ws
 
     def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
         log.debug(f"Recieved websocket message {msg}")
