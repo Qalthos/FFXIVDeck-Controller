@@ -15,7 +15,9 @@ class DoAction(ActionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "action"
+        self.cache_dir = (
+            Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "action"
+        )
 
     @property
     def name(self) -> str:
@@ -38,7 +40,7 @@ class DoAction(ActionBase):
 
         self.set_label(text=name.title())
 
-    def get_config_rows(self) -> list:
+    def get_config_rows(self) -> list[Adw.PreferencesRow]:
         self._action = Adw.EntryRow(title="Action Name")
         self._action.set_text(self.name)
         self._category = Adw.ComboRow(model=categories, title="Category")
@@ -55,7 +57,7 @@ class DoAction(ActionBase):
         category = categories.get_string(self.category)
         self.update_appearance(category, self.name)
 
-    def on_action_changed(self, entry, *args):
+    def on_action_changed(self, entry: Adw.EntryRow, *args) -> None:
         name = entry.get_text()
 
         settings = self.get_settings()
@@ -65,17 +67,19 @@ class DoAction(ActionBase):
         category = categories.get_string(self.category)
         self.update_appearance(category, name)
 
-    def on_category_changed(self, entry, *args):
+    def on_category_changed(self, entry: Adw.ComboRow, *args) -> None:
         category = entry.get_selected()
 
         settings = self.get_settings()
         settings["category"] = category
         self.set_settings(settings)
 
-    def on_key_down(self):
-        threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
+    def on_key_down(self) -> None:
+        threading.Thread(
+            target=self._on_key_down, daemon=True, name="get_request"
+        ).start()
 
-    def _on_key_down(self):
+    def _on_key_down(self) -> None:
         action = self.name
         category = categories.get_string(self.category)
 

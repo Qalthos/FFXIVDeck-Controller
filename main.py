@@ -16,7 +16,7 @@ class FFXIVPlugin(PluginBase):
         super().__init__()
 
         log.debug("Launch backend")
-        backend = os.path.join(self.PATH,  "backend", "backend.py")
+        backend = os.path.join(self.PATH, "backend", "backend.py")
         self.launch_backend(backend)
 
         ## Register actions
@@ -64,5 +64,5 @@ class FFXIVPlugin(PluginBase):
             plugin_name="FFXIVDeck-Controller",
             github_repo="https://github.com/qalthos/FFXIVDeck-Controller",
             plugin_version="0.0.1",
-            app_version="1.1.1-alpha"
+            app_version="1.1.1-alpha",
         )

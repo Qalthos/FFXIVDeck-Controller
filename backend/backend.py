@@ -2,18 +2,44 @@ from functools import wraps
 import json
 import threading
 import time
+from typing import Callable
 
 from loguru import logger as log
 import requests
 from streamcontroller_plugin_tools import BackendBase
 import websocket
 
+from .message_types import InitOpcode, Opcode, VolumeOpcode
 
-INIT = {
+
+INIT: InitOpcode = {
     "Opcode": "init",
     "Version": "0.3.999",
     "Mode": "Developer",
 }
+
+
+def volume_message(
+    channel="master",
+    volume: int | None = None,
+    delta: int | None = None,
+    mute: bool | None = None,
+) -> VolumeOpcode:
+    volume_payload = {
+        "Opcode": "setVolume",
+        "Channel": channel,
+    }
+
+    data = {}
+    if volume is not None:
+        data["Volume"] = volume
+    if delta is not None:
+        data["Delta"] = delta
+    if mute is not None:
+        data["Muted"] = mute
+
+    volume_payload["Data"] = data
+    return volume_payload
 
 
 class XIVDeckProxy(BackendBase):
@@ -30,7 +56,7 @@ class XIVDeckProxy(BackendBase):
 
         self.session = requests.Session()
 
-    def ensure_connect(func):
+    def ensure_connect(func: Callable):
         @wraps(func)
         def wrapped(self, *args, **kwargs):
             if not self._connected:
@@ -68,13 +94,13 @@ class XIVDeckProxy(BackendBase):
         self.ws_send(payload)
 
     @ensure_connect
-    def ws_send(self, payload: dict) -> None:
+    def ws_send(self, payload: Opcode) -> None:
         self.ws.send(payload)
 
     def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
         log.debug(f"Recieved websocket message {msg}")
         match json.loads(msg):
-            case {"messageType": "initReply", "apiKey": api_key, "version": version}:
+            case {"messageType": "initReply", "apiKey": api_key, "version": _}:
                 log.debug(f"Setting API key to {api_key}")
                 self.api_key = api_key
                 self.session.headers["Authorization"] = f"Bearer {self.api_key}"
@@ -117,10 +143,7 @@ class XIVDeckProxy(BackendBase):
         log.debug(f"API key: {self.api_key}")
         log.debug(self.session.headers)
         resp = self.session.request(
-            method=method,
-            url=self.base_url + path,
-            data=data.encode("utf8"),
-            timeout=2
+            method=method, url=self.base_url + path, data=data.encode("utf8"), timeout=2
         )
         log.debug(f"Returned {resp.status_code}: {resp.text!r}")
         try:

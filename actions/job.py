@@ -54,7 +54,9 @@ class ChangeClass(ActionBase):
         self.update_appearance(job_name)
 
     def on_key_down(self) -> None:
-        threading.Thread(target=self._on_key_down, daemon=True, name="get_request").start()
+        threading.Thread(
+            target=self._on_key_down, daemon=True, name="get_request"
+        ).start()
 
     def _on_key_down(self) -> None:
         job = self.name
