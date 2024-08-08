@@ -13,8 +13,6 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@3.2.4
-          - prettier-plugin-toml@2.0.1
-          - prettier-plugin-sort-json@3.1.0
 
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v4.6.0
@@ -23,7 +21,6 @@ repos:
       - id: trailing-whitespace
       - id: mixed-line-ending
       - id: fix-byte-order-marker
-      - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: debug-statements
         language_version: python3
