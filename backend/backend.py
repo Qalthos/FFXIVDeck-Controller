@@ -30,6 +30,17 @@ class XIVDeckProxy(BackendBase):
 
         self.session = requests.Session()
 
+    def ensure_connect(func):
+        @wraps(func)
+        def wrapped(self, *args, **kwargs):
+            if not self._connected:
+                self.connect()
+                while not self._connected:
+                    time.sleep(0.1)
+            return func(self, *args, **kwargs)
+
+        return wrapped
+
     def connect(self) -> None:
         url = f"ws://{self.host}:{self.port}/ws"
         log.debug(f"Connecting to {url}")
@@ -50,9 +61,15 @@ class XIVDeckProxy(BackendBase):
 
     # websocket callbacks
     def ws_open(self, ws: websocket.WebSocket) -> None:
-        payload = json.dumps(INIT)
-        ws.send(payload)
         self.ws = ws
+        self._connected = True
+
+        payload = json.dumps(INIT)
+        self.ws_send(payload)
+
+    @ensure_connect
+    def ws_send(self, payload: dict) -> None:
+        self.ws.send(payload)
 
     def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
         log.debug(f"Recieved websocket message {msg}")
@@ -61,24 +78,12 @@ class XIVDeckProxy(BackendBase):
                 log.debug(f"Setting API key to {api_key}")
                 self.api_key = api_key
                 self.session.headers["Authorization"] = f"Bearer {self.api_key}"
-                self._connected = True
             case _:
                 log.debug(f"Unhandled message: {msg}")
 
     def ws_close(self, ws: websocket.WebSocket) -> None:
         self.disconnect()
         log.debug("Websocket has closed")
-
-    def ensure_connect(func):
-        @wraps(func)
-        def wrapped(self, *args, **kwargs):
-            if not self._connected:
-                self.connect()
-                while not self._connected:
-                    time.sleep(0.1)
-            return func(self, *args, **kwargs)
-
-        return wrapped
 
     # HTTP methods and properties
     @property
