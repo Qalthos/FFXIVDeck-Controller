@@ -9,7 +9,7 @@ import requests
 from streamcontroller_plugin_tools import BackendBase
 import websocket
 
-from .message_types import InitOpcode, Opcode, VolumeOpcode
+from message_types import InitOpcode, Opcode, VolumeOpcode, VolumePayload
 
 
 INIT: InitOpcode = {
@@ -25,12 +25,8 @@ def volume_message(
     delta: int | None = None,
     mute: bool | None = None,
 ) -> VolumeOpcode:
-    volume_payload = {
-        "Opcode": "setVolume",
-        "Channel": channel,
-    }
 
-    data = {}
+    data: VolumePayload = {}
     if volume is not None:
         data["Volume"] = volume
     if delta is not None:
@@ -38,7 +34,11 @@ def volume_message(
     if mute is not None:
         data["Muted"] = mute
 
-    volume_payload["Data"] = data
+    volume_payload: VolumeOpcode = {
+        "Opcode": "setVolume",
+        "Channel": channel,
+        "Data": data,
+    }
     return volume_payload
 
 
