@@ -3,7 +3,6 @@ import os
 import threading
 
 from gi.repository import Adw
-
 from src.backend.PluginManager.ActionBase import ActionBase
 
 

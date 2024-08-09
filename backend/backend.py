@@ -1,16 +1,14 @@
-from functools import wraps
 import json
 import threading
 import time
+from functools import wraps
 from typing import Callable
 
-from loguru import logger as log
 import requests
-from streamcontroller_plugin_tools import BackendBase
 import websocket
-
+from loguru import logger as log
 from message_types import InitOpcode, Opcode, VolumeOpcode, VolumePayload
-
+from streamcontroller_plugin_tools import BackendBase
 
 INIT: InitOpcode = {
     "Opcode": "init",

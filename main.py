@@ -1,11 +1,11 @@
 import os
 
 from loguru import logger as log
-
 from src.backend.DeckManagement.InputIdentifier import Input
 from src.backend.PluginManager.ActionHolder import ActionHolder
 from src.backend.PluginManager.ActionInputSupport import ActionInputSupport
 from src.backend.PluginManager.PluginBase import PluginBase
+
 from .actions.action import DoAction
 from .actions.command import RunCommand
 from .actions.job import ChangeClass

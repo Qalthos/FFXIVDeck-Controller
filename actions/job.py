@@ -1,10 +1,9 @@
 import os
-from pathlib import Path
 import threading
+from pathlib import Path
 
 from gi.repository import Adw
 from loguru import logger as log
-
 from src.backend.PluginManager.ActionBase import ActionBase
 
 

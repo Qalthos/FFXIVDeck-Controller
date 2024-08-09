@@ -1,12 +1,10 @@
 import os
-from pathlib import Path
 import threading
+from pathlib import Path
 
-from gi.repository import Gtk, Adw
+from gi.repository import Adw, Gtk
 from loguru import logger as log
-
 from src.backend.PluginManager.ActionBase import ActionBase
-
 
 categories = Gtk.StringList.new(["MainCommand", "Emote"])
 
