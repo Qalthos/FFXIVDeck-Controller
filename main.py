@@ -9,6 +9,7 @@ from src.backend.PluginManager.PluginBase import PluginBase
 from .actions.action import DoAction
 from .actions.command import RunCommand
 from .actions.job import ChangeClass
+from .actions.volume import ChangeVolume
 
 
 class FFXIVPlugin(PluginBase):
@@ -58,6 +59,19 @@ class FFXIVPlugin(PluginBase):
             },
         )
         self.add_action_holder(self.job_holder)
+
+        self.volume_holder = ActionHolder(
+            plugin_base=self,
+            action_base=ChangeVolume,
+            action_id_suffix="ChangeVolume",
+            action_name="Change Volume",
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.UNSUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
+        )
+        self.add_action_holder(self.volume_holder)
 
         # Register plugin
         self.register(

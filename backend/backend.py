@@ -7,7 +7,7 @@ from typing import Callable
 import requests
 import websocket
 from loguru import logger as log
-from message_types import InitOpcode, Opcode, VolumeOpcode, VolumePayload
+from message_types import InitOpcode, Opcode
 from streamcontroller_plugin_tools import BackendBase
 
 INIT: InitOpcode = {
@@ -15,29 +15,6 @@ INIT: InitOpcode = {
     "Version": "0.3.999",
     "Mode": "Developer",
 }
-
-
-def volume_message(
-    channel="master",
-    volume: int | None = None,
-    delta: int | None = None,
-    mute: bool | None = None,
-) -> VolumeOpcode:
-
-    data: VolumePayload = {}
-    if volume is not None:
-        data["Volume"] = volume
-    if delta is not None:
-        data["Delta"] = delta
-    if mute is not None:
-        data["Muted"] = mute
-
-    volume_payload: VolumeOpcode = {
-        "Opcode": "setVolume",
-        "Channel": channel,
-        "Data": data,
-    }
-    return volume_payload
 
 
 class XIVDeckProxy(BackendBase):
