@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+from pathlib import Path
 
 from loguru import logger as log
 
@@ -20,7 +20,7 @@ class FFXIVPlugin(PluginBase):
         super().__init__()
 
         log.debug("Launch backend")
-        backend = os.path.join(self.PATH, "backend", "backend.py")
+        backend = Path(self.PATH) / "backend" / "backend.py"
         self.launch_backend(backend)
 
         ## Register actions

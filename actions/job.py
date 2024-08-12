@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import threading
 
 from pathlib import Path
@@ -12,7 +11,7 @@ from src.backend.PluginManager.ActionBase import ActionBase
 
 
 class ChangeClass(ActionBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "class"
@@ -25,11 +24,11 @@ class ChangeClass(ActionBase):
     def update_appearance(self, job_name: str) -> None:
         icon_path = self.cache_dir / f"{job_name.lower()}.png"
         log.debug(f"Trying to set icon to {icon_path}")
-        if icon_path.exists:
+        if icon_path.exists():
             self.set_media(media_path=icon_path)
         else:
             log.warning(f"Cannot find {icon_path}")
-            icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+            icon_path = Path(self.plugin_base.PATH) / "assets" / "info.png"
             self.set_media(media_path=icon_path)
 
         self.set_label(text=job_name.title())
@@ -47,7 +46,7 @@ class ChangeClass(ActionBase):
     def on_ready(self) -> None:
         self.update_appearance(self.name)
 
-    def on_job_changed(self, entry, *args) -> None:
+    def on_job_changed(self, entry: Adw.EntryRow) -> None:
         job_name = entry.get_text()
 
         settings = self.get_settings()
@@ -69,7 +68,7 @@ class ChangeClass(ActionBase):
         # Find available classes
         try:
             classes = self.plugin_base.backend.get_json("classes/available")
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             log.error(f"Could not communicate with backend: {exc}")
             self.show_error(duration=1)
             return

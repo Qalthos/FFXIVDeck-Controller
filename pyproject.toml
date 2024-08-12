@@ -23,7 +23,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D1"]
+ignore = ["ANN002", "ANN003", "D1"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

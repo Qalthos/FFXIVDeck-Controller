@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import os
 import threading
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from gi.repository import Adw
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class ChangeVolume(ActionBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     @property
@@ -43,17 +43,17 @@ class ChangeVolume(ActionBase):
 
     # Callbacks
     def on_ready(self) -> None:
-        icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+        icon_path = Path(self.plugin_base.PATH) / "assets" / "info.png"
         self.set_media(media_path=icon_path)
 
-    def on_channel_changed(self, entry, *args) -> None:
+    def on_channel_changed(self, entry: Adw.EntryRow) -> None:
         channel = entry.get_text()
 
         settings = self.get_settings()
         settings["channel"] = channel
         self.set_settings(settings)
 
-    def on_value_changed(self, entry, *args) -> None:
+    def on_value_changed(self, entry: Adw.EntryRow) -> None:
         value = int(entry.get_text())
 
         settings = self.get_settings()
@@ -77,7 +77,7 @@ class ChangeVolume(ActionBase):
 
 
 def volume_message(
-    channel="master",
+    channel: str = "master",
     volume: int | None = None,
     delta: int | None = None,
     mute: bool | None = None,

@@ -5,7 +5,7 @@ import threading
 import time
 
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
 import requests
 import websocket
@@ -16,6 +16,7 @@ from streamcontroller_plugin_tools import BackendBase
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any, Concatenate
 
     from message_types import InitOpcode, Opcode
 
@@ -25,6 +26,23 @@ INIT: InitOpcode = {
     "Version": "0.3.999",
     "Mode": "Developer",
 }
+
+P = ParamSpec("P")
+T = TypeVar("T")
+
+
+def ensure_connect(
+    func: Callable[Concatenate[XIVDeckProxy, P], T],
+) -> Callable[Concatenate[XIVDeckProxy, P], T]:
+    @wraps(func)
+    def wrapped(self: XIVDeckProxy, *args: P.args, **kwargs: P.kwargs) -> T:
+        if not self._connected:
+            self.connect()
+            while not self._connected:
+                time.sleep(0.1)
+        return func(self, *args, **kwargs)
+
+    return wrapped
 
 
 class XIVDeckProxy(BackendBase):
@@ -36,21 +54,10 @@ class XIVDeckProxy(BackendBase):
     ws: websocket.WebSocket
     session: requests.Session
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.session = requests.Session()
-
-    def ensure_connect(func: Callable):
-        @wraps(func)
-        def wrapped(self, *args, **kwargs):
-            if not self._connected:
-                self.connect()
-                while not self._connected:
-                    time.sleep(0.1)
-            return func(self, *args, **kwargs)
-
-        return wrapped
 
     def connect(self) -> None:
         url = f"ws://{self.host}:{self.port}/ws"
@@ -82,7 +89,7 @@ class XIVDeckProxy(BackendBase):
     def ws_send(self, payload: Opcode) -> None:
         self.ws.send(payload)
 
-    def ws_msg(self, ws: websocket.WebSocket, msg: str) -> None:
+    def ws_msg(self, _ws: websocket.WebSocket, msg: str) -> None:
         log.debug(f"Recieved websocket message {msg}")
         match json.loads(msg):
             case {"messageType": "initReply", "apiKey": api_key, "version": _}:
@@ -92,7 +99,7 @@ class XIVDeckProxy(BackendBase):
             case _:
                 log.debug(f"Unhandled message: {msg}")
 
-    def ws_close(self, ws: websocket.WebSocket) -> None:
+    def ws_close(self, _ws: websocket.WebSocket) -> None:
         self.disconnect()
         log.debug("Websocket has closed")
 
@@ -102,7 +109,7 @@ class XIVDeckProxy(BackendBase):
         return f"http://{self.host}:{self.port}/"
 
     @ensure_connect
-    def get_json(self, path: str):
+    def get_json(self, path: str) -> dict[str, Any]:
         log.debug(f"Requesting {self.base_url}{path}")
         try:
             resp = self._request(path)

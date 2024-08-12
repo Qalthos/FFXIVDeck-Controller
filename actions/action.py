@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import threading
 
 from pathlib import Path
@@ -15,7 +14,7 @@ categories = Gtk.StringList.new(["MainCommand", "Emote"])
 
 
 class DoAction(ActionBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "action"
@@ -36,7 +35,7 @@ class DoAction(ActionBase):
             self.set_media(media_path=icon_path)
         else:
             log.debug(f"Cannot find {icon_path}")
-            icon_path = os.path.join(self.plugin_base.PATH, "assets", "info.png")
+            icon_path = Path(self.plugin_base.PATH) / "assets" / "info.png"
             self.set_media(media_path=icon_path)
 
         self.set_label(text=name.title())
@@ -58,7 +57,7 @@ class DoAction(ActionBase):
         category = categories.get_string(self.category)
         self.update_appearance(category, self.name)
 
-    def on_action_changed(self, entry: Adw.EntryRow, *args) -> None:
+    def on_action_changed(self, entry: Adw.EntryRow) -> None:
         name = entry.get_text()
 
         settings = self.get_settings()
@@ -68,7 +67,7 @@ class DoAction(ActionBase):
         category = categories.get_string(self.category)
         self.update_appearance(category, name)
 
-    def on_category_changed(self, entry: Adw.ComboRow, *args) -> None:
+    def on_category_changed(self, entry: Adw.ComboRow) -> None:
         category = entry.get_selected()
 
         settings = self.get_settings()
