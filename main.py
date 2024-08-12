@@ -78,8 +78,8 @@ class FFXIVPlugin(PluginBase):
 
         # Register plugin
         self.register(
-            plugin_name="FFXIVDeck-Controller",
+            plugin_name="XIVDeck Controller",
             github_repo="https://github.com/qalthos/FFXIVDeck-Controller",
-            plugin_version="0.0.1",
+            plugin_version="0.2.0",
             app_version="1.1.1-alpha",
         )

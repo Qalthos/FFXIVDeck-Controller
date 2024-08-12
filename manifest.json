@@ -1,8 +1,8 @@
 {
-  "version": "0.0.2",
+  "version": "0.2.0",
   "thumbnail": "",
-  "id": "com_linkybook_FFXIVDeck",
-  "name": "FFXIVDeck Controller",
+  "id": "com_linkybook_XIVDeck",
+  "name": "XIVDeck Controller",
   "app-version": "",
   "author": "Qalthos",
   "github": "https://github.com/Qalthos/FFXIVDeck-Controller"
