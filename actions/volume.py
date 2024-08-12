@@ -33,7 +33,7 @@ class ChangeVolume(ActionBase):
         self._channel.set_text(self.channel)
 
         self._value = Adw.EntryRow(title="Value to apply")
-        self._value.set_text(self.value)
+        self._value.set_text(str(self.value))
 
         # Connect signals
         self._channel.connect("notify::text", self.on_command_changed)
