@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 import os
 import threading
 
+from typing import TYPE_CHECKING
+
 from gi.repository import Adw
+
 from src.backend.PluginManager.ActionBase import ActionBase
 
-from .backend.message_types import VolumeOpcode, VolumePayload
+
+if TYPE_CHECKING:
+    from .backend.message_types import VolumeOpcode, VolumePayload
 
 
 class ChangeVolume(ActionBase):
@@ -55,7 +62,9 @@ class ChangeVolume(ActionBase):
 
     def on_key_down(self) -> None:
         threading.Thread(
-            target=self._on_key_down, daemon=True, name="get_request"
+            target=self._on_key_down,
+            daemon=True,
+            name="get_request",
         ).start()
 
     def _on_key_down(self) -> None:

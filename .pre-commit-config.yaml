@@ -14,24 +14,24 @@ repos:
         additional_dependencies:
           - prettier@3.2.4
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-      - id: mixed-line-ending
-      - id: fix-byte-order-marker
       - id: check-merge-conflict
+      - id: check-symlinks
       - id: debug-statements
         language_version: python3
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: trailing-whitespace
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+  - repo: https://github.com/asottile/add-trailing-comma.git
+    rev: v3.1.0
     hooks:
-      - id: isort
+      - id: add-trailing-comma
         args:
-          # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
-          - --filter-files
+          - --py36-plus
 
   - repo: https://github.com/psf/black
     rev: 24.8.0
@@ -49,7 +49,6 @@ repos:
     rev: v1.11.1
     hooks:
       - id: mypy
-        # empty args needed in order to match mypy cli behavior
         additional_dependencies:
           - loguru
           - PyGObject

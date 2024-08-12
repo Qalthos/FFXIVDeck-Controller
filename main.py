@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import os
 
 from loguru import logger as log
+
 from src.backend.DeckManagement.InputIdentifier import Input
 from src.backend.PluginManager.ActionHolder import ActionHolder
 from src.backend.PluginManager.ActionInputSupport import ActionInputSupport
@@ -13,7 +16,7 @@ from .actions.volume import ChangeVolume
 
 
 class FFXIVPlugin(PluginBase):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         log.debug("Launch backend")

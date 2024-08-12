@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import os
 import threading
+
 from pathlib import Path
 
 from gi.repository import Adw, Gtk
 from loguru import logger as log
+
 from src.backend.PluginManager.ActionBase import ActionBase
+
 
 categories = Gtk.StringList.new(["MainCommand", "Emote"])
 
@@ -13,9 +18,7 @@ class DoAction(ActionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.cache_dir = (
-            Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "action"
-        )
+        self.cache_dir = Path("~/.cache").expanduser() / "ffxivdeck" / "icons" / "action"
 
     @property
     def name(self) -> str:
@@ -74,7 +77,9 @@ class DoAction(ActionBase):
 
     def on_key_down(self) -> None:
         threading.Thread(
-            target=self._on_key_down, daemon=True, name="get_request"
+            target=self._on_key_down,
+            daemon=True,
+            name="get_request",
         ).start()
 
     def _on_key_down(self) -> None:

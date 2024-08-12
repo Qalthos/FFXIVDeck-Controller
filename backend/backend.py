@@ -1,14 +1,24 @@
+from __future__ import annotations
+
 import json
 import threading
 import time
+
 from functools import wraps
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import requests
 import websocket
+
 from loguru import logger as log
-from message_types import InitOpcode, Opcode
 from streamcontroller_plugin_tools import BackendBase
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from message_types import InitOpcode, Opcode
+
 
 INIT: InitOpcode = {
     "Opcode": "init",
@@ -118,7 +128,10 @@ class XIVDeckProxy(BackendBase):
         log.debug(f"API key: {self.api_key}")
         log.debug(self.session.headers)
         resp = self.session.request(
-            method=method, url=self.base_url + path, data=data.encode("utf8"), timeout=2
+            method=method,
+            url=self.base_url + path,
+            data=data.encode("utf8"),
+            timeout=2,
         )
         log.debug(f"Returned {resp.status_code}: {resp.text!r}")
         try:

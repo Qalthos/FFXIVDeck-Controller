@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import json
 import os
 import threading
 
 from gi.repository import Adw
+
 from src.backend.PluginManager.ActionBase import ActionBase
 
 
@@ -38,7 +41,9 @@ class RunCommand(ActionBase):
 
     def on_key_down(self):
         threading.Thread(
-            target=self._on_key_down, daemon=True, name="get_request"
+            target=self._on_key_down,
+            daemon=True,
+            name="get_request",
         ).start()
 
     def _on_key_down(self):

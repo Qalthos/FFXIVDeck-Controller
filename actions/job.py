@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import os
 import threading
+
 from pathlib import Path
 
 from gi.repository import Adw
 from loguru import logger as log
+
 from src.backend.PluginManager.ActionBase import ActionBase
 
 
@@ -54,7 +58,9 @@ class ChangeClass(ActionBase):
 
     def on_key_down(self) -> None:
         threading.Thread(
-            target=self._on_key_down, daemon=True, name="get_request"
+            target=self._on_key_down,
+            daemon=True,
+            name="get_request",
         ).start()
 
     def _on_key_down(self) -> None:
